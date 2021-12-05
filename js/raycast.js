@@ -89,7 +89,42 @@ class Player {
 
 class Ray {
 	constructor(rayAngle) {
-		this.rayAngle = rayAngle;
+		this.rayAngle = normalizeAngle(rayAngle);
+	 	// position where ray hits wall
+		this.wallHitX = 0;
+		this.wallHitY = 0;
+		this.distance = 0; // distance between player and collision
+
+		this.isRayFacingDown = this.rayAngle > 0 && this.rayAngle < Math.PI;
+		this.isRayFacingUp = !this.isRayFacingDown;
+
+		this.isRayFacingRight = this.rayAngle < 0.5 * Math.PI || this.rayAngle > 1.5 * Math.PI;
+		this.isRayFacingLeft = !this.isRayFacingRight;
+	}
+	cast(columnId) {
+		var xintersecpt, yintercept; // closest points to the wall
+		var xstep, ystep; // delta x and delta y
+
+		////////////////////////////////////////////
+		// HORIZONTAL RAY-GRID INTERSECTION CODE 
+		// /////////////////////////////////////////
+		
+		console.log("isRayFacingRight", this.isRayFacingRight);
+
+		// find the y-coordinate of the closest horizontal grid intersection
+		yintercept = Math.floor(player.y / TILE_SIZE) * TILE_SIZE; 
+		yintercept += this.isRayFacingDown ? TILE_SIZE : 0;
+
+		// find the x-coordinate of the closest horizontal grid intersection
+		xintersecpt = player.x + (yintercept - player.y) / Math.tan(this.rayAngle);
+		
+		// calculate the increment for xstep and ystep
+		ystep = TILE_SIZE;
+		ystep *= this.isRayFacingUp ? -1 : 1;
+
+		xstep = TILE_SIZE / Math.tan(this.rayAngle);
+		xstep *= (this.isRayFacingLeft && xstep > 0) ? -1 : 1;
+		xstep *= (this.isRayFacingRight && xstep < 0 ? -1 : 1);
 	}
 	render () {
 		stroke("rgba(255, 0, 0, 0.3)");
@@ -139,15 +174,24 @@ function castAllRays() {
 	rays = [];
 
 	// loop all columns casting rays
-	for (var i = 0; i < NUM_RAYS; i++) {
+//	for (var i = 0; i < NUM_RAYS; i++) {
+		for (var i = 0; i < 1; i++) {
 		var ray = new Ray(rayAngle);
-		// TODO: ray.cast(); ...
+		ray.cast(columnId); 
 		rays.push(ray);
 
 		rayAngle += FOV_ANGLE /  NUM_RAYS;
 
 		columnId++;
 	}
+}
+function normalizeAngle(angle) {
+	// mantains angle value whitin 2PI
+	angle = angle % (2 * Math.PI); 
+	if(angle < 0) {
+		angle += 2 * Math.PI;
+	}
+	return angle;
 }
 
 function setup() {
