@@ -10,6 +10,7 @@ const FOV_ANGLE = 60 * (Math.PI / 180); // 60 degrees in radians
 const WALL_STRIP_WIDTH = 1; // number of pixels per column 
 const NUM_RAYS = WINDOW_WIDTH / WALL_STRIP_WIDTH;
 
+const MINIMAP_SCALE_FACTOR = 0.2;
 
 class Map {
     constructor() {
@@ -43,7 +44,12 @@ class Map {
                 var tileColor = this.grid[i][j] == 1 ? "#222" : "#fff";
                 stroke("#222");
                 fill(tileColor);
-                rect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+                rect(
+                    MINIMAP_SCALE_FACTOR * tileX, 
+                    MINIMAP_SCALE_FACTOR * tileY, 
+                    MINIMAP_SCALE_FACTOR * TILE_SIZE, 
+                    MINIMAP_SCALE_FACTOR* TILE_SIZE)
+                    ;
             }
         }
     }
@@ -75,14 +81,18 @@ class Player {
     }
     render() {
         noStroke();
-        fill("red");
-        circle(this.x, this.y, this.radius);
-        stroke("red");
+        fill("blue");
+        circle(
+            MINIMAP_SCALE_FACTOR * this.x, 
+            MINIMAP_SCALE_FACTOR * this.y, 
+            MINIMAP_SCALE_FACTOR * this.radius
+            );
+        stroke("blue");
         line(
-            this.x,
-            this.y,
-            this.x + Math.cos(this.rotationAngle) * 30,
-            this.y + Math.sin(this.rotationAngle) * 30
+            MINIMAP_SCALE_FACTOR * this.x,
+            MINIMAP_SCALE_FACTOR * this.y,
+            MINIMAP_SCALE_FACTOR * (this.x + Math.cos(this.rotationAngle) * 30),
+            MINIMAP_SCALE_FACTOR * (this.y + Math.sin(this.rotationAngle) * 30)
         );
     }
 }
@@ -199,10 +209,10 @@ class Ray {
     render() {
         stroke("rgba(255, 0, 0, 0.3)");
         line(
-            player.x,
-            player.y,
-            this.wallHitX,
-            this.wallHitY
+            MINIMAP_SCALE_FACTOR * player.x,
+            MINIMAP_SCALE_FACTOR * player.y,
+            MINIMAP_SCALE_FACTOR * this.wallHitX,
+            MINIMAP_SCALE_FACTOR * this.wallHitY
         );
     }
 }
